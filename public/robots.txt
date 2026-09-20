@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /
+
+# This is an operational tool, not a public website.

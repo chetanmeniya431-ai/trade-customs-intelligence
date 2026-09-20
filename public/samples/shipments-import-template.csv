@@ -1,0 +1,3 @@
+reference,direction,origin_country,destination_country,product_description,hs_code,declared_value,declared_currency,mode,incoterms,expected_date,filing_deadline,client_name
+,import,China,India,"Cotton fabric woven, 100% cotton",520852,12500,USD,sea,FOB,2026-04-15,2026-04-10 17:00:00,Arjun Textiles Pvt Ltd
+,export,India,UAE,"Organic turmeric powder in 25kg bags",091030,8200,USD,sea,CIF,2026-04-20,2026-04-16 12:00:00,Pure Harvest Foods
