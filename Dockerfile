@@ -24,9 +24,6 @@ COPY . .
 RUN composer install --no-scripts --no-interaction --prefer-dist --no-progress \
     && npm run build
 
-RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache \
-    && chmod -R 775 storage bootstrap/cache
-
 EXPOSE 8007
 
 # The bind mount in docker-compose.yml (.:/var/www/html) shadows this image's
