@@ -21,7 +21,7 @@ RUN npm install
 
 COPY . .
 
-RUN composer install --no-interaction --prefer-dist --no-progress \
+RUN composer install --no-scripts --no-interaction --prefer-dist --no-progress \
     && npm run build
 
 RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache \
