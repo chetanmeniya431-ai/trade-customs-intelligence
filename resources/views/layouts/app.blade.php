@@ -13,7 +13,8 @@
     <style>body { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }</style>
 </head>
 <body class="h-full">
-<div x-data="{ sidebarOpen: false }" class="min-h-full lg:flex">
+<livewire:demo-contact-modal />
+<div x-data="{ sidebarOpen: false }" class="{{ auth()->check() && !auth()->user()->hasRole('Super Admin') ? 'pt-10' : '' }} min-h-full lg:flex">
 
     <div x-show="sidebarOpen" x-cloak class="fixed inset-0 z-40 bg-gray-900/60 lg:hidden" @click="sidebarOpen = false"></div>
 
@@ -42,6 +43,20 @@
                     {{ $item['label'] }}
                 </a>
             @endforeach
+
+            @role('Super Admin')
+                <div class="pt-4 mt-4 border-t border-gray-800 space-y-1">
+                    <a href="{{ route('super-admin.contacts') }}"
+                       class="group flex items-center gap-x-3 rounded-md px-3 py-2 text-sm font-medium {{ request()->routeIs('super-admin.*') ? 'bg-teal-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' }}">
+                        <x-icon name="envelope" class="h-5 w-5 shrink-0" />
+                        Contact Requests
+                        @php $newCount = \App\Models\ContactRequest::where('status','new')->count(); @endphp
+                        @if($newCount > 0)
+                            <span class="ml-auto inline-flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-xs font-bold text-white">{{ $newCount }}</span>
+                        @endif
+                    </a>
+                </div>
+            @endrole
 
             @role('Customs Broker|Import/Export Coordinator')
                 <div class="pt-4 mt-4 border-t border-gray-800 space-y-1">
@@ -95,5 +110,57 @@
     </div>
 </div>
 @livewireScripts
+
+@if(auth()->check() && !auth()->user()->hasRole('Super Admin'))
+<script>
+// Demo guard — intercept mutation actions and show the contact modal instead
+(function () {
+    var MUTATION_KEYWORDS = [
+        'save','create','delete','upload','store','update','submit','add','remove',
+        'edit','import','approve','reject','attach','detach','assign','dispatch',
+        'generate','export','send','confirm','destroy','toggle'
+    ];
+
+    function isMutation(wireClick) {
+        if (!wireClick) return false;
+        var lc = wireClick.toLowerCase();
+        return MUTATION_KEYWORDS.some(function (k) { return lc.includes(k); });
+    }
+
+    function showDemoModal() {
+        if (window.Livewire) {
+            Livewire.dispatch('show-demo-modal');
+        }
+    }
+
+    document.addEventListener('click', function (e) {
+        // Check the clicked element and up to 4 ancestors for wire:click
+        var el = e.target;
+        for (var i = 0; i < 5; i++) {
+            if (!el || el === document.body) break;
+            var wireClick = el.getAttribute ? el.getAttribute('wire:click') : null;
+            if (wireClick && isMutation(wireClick)) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                showDemoModal();
+                return;
+            }
+            // Also block submit buttons inside Livewire forms (excluding logout)
+            if (el.tagName === 'BUTTON' && (el.type === 'submit' || !el.type) &&
+                el.closest('[wire\\:id]') && !el.closest('form[action*="logout"]')) {
+                var wireSubmit = el.closest('form') ? el.closest('form').getAttribute('wire:submit') : null;
+                if (!wireSubmit || isMutation(wireSubmit)) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    showDemoModal();
+                    return;
+                }
+            }
+            el = el.parentElement;
+        }
+    }, true);
+})();
+</script>
+@endif
 </body>
 </html>

@@ -14,6 +14,7 @@ class UsersSeeder extends Seeder
         $clientCompany = Client::where('name', 'Arjun Textiles Pvt Ltd')->first();
 
         $users = [
+            ['name' => 'Super Admin', 'email' => 'superadmin@tradecustoms.local', 'role' => 'Super Admin'],
             ['name' => 'Meridian Admin', 'email' => 'admin@tradecustoms.local', 'role' => 'Customs Broker'],
             ['name' => 'Coordinator User', 'email' => 'coordinator@tradecustoms.local', 'role' => 'Import/Export Coordinator'],
             ['name' => 'Compliance User', 'email' => 'compliance@tradecustoms.local', 'role' => 'Compliance Manager'],

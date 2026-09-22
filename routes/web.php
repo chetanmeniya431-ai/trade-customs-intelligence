@@ -8,6 +8,7 @@ use App\Livewire\Auth\ForgotPassword;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\ResetPassword;
 use App\Livewire\Clients\Index as ClientsIndex;
+use App\Livewire\SuperAdmin\ContactRequests as SuperAdminContacts;
 use App\Livewire\Dashboard;
 use App\Livewire\HsCode\Finder as HsCodeFinder;
 use App\Livewire\Insights\Index as InsightsIndex;
@@ -65,4 +66,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/settings/users', SettingsUsers::class)
         ->name('settings.users')
         ->middleware('role:Customs Broker');
+
+    Route::get('/super-admin/contacts', SuperAdminContacts::class)
+        ->name('super-admin.contacts')
+        ->middleware('role:Super Admin');
 });

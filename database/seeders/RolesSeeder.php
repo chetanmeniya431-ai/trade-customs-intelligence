@@ -8,6 +8,7 @@ use Spatie\Permission\Models\Role;
 class RolesSeeder extends Seeder
 {
     public const ROLES = [
+        'Super Admin',
         'Customs Broker',
         'Import/Export Coordinator',
         'Compliance Manager',
