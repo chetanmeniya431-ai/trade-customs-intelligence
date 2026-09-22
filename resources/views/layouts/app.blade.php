@@ -115,7 +115,17 @@
 
 @if(auth()->check() && !auth()->user()->hasRole('Super Admin'))
 <script>
-// Demo guard — intercept mutation actions and show the contact modal instead
+document.addEventListener('livewire:init', function () {
+    Livewire.hook('request', function ({ fail }) {
+        fail(function ({ status, preventDefault }) {
+            if (status === 403) {
+                preventDefault();
+                Livewire.dispatch('show-demo-modal');
+            }
+        });
+    });
+});
+
 (function () {
     var MUTATION_KEYWORDS = [
         'save','create','delete','upload','store','update','submit','add','remove',
@@ -123,43 +133,57 @@
         'generate','export','send','confirm','destroy','toggle'
     ];
 
-    function isMutation(wireClick) {
-        if (!wireClick) return false;
-        var lc = wireClick.toLowerCase();
+    function isMutation(str) {
+        if (!str) return false;
+        var lc = str.toLowerCase();
         return MUTATION_KEYWORDS.some(function (k) { return lc.includes(k); });
     }
 
     function showDemoModal() {
-        if (window.Livewire) {
-            Livewire.dispatch('show-demo-modal');
-        }
+        if (window.Livewire) { Livewire.dispatch('show-demo-modal'); }
     }
 
     document.addEventListener('click', function (e) {
-        // Check the clicked element and up to 4 ancestors for wire:click
         var el = e.target;
         for (var i = 0; i < 5; i++) {
             if (!el || el === document.body) break;
             var wireClick = el.getAttribute ? el.getAttribute('wire:click') : null;
             if (wireClick && isMutation(wireClick)) {
-                e.preventDefault();
-                e.stopImmediatePropagation();
-                showDemoModal();
-                return;
+                e.preventDefault(); e.stopImmediatePropagation();
+                showDemoModal(); return;
             }
-            // Also block submit buttons inside Livewire forms (excluding logout)
             if (el.tagName === 'BUTTON' && (el.type === 'submit' || !el.type) &&
                 el.closest('[wire\\:id]') && !el.closest('form[action*="logout"]')) {
-                var wireSubmit = el.closest('form') ? el.closest('form').getAttribute('wire:submit') : null;
-                if (!wireSubmit || isMutation(wireSubmit)) {
-                    e.preventDefault();
-                    e.stopImmediatePropagation();
-                    showDemoModal();
-                    return;
-                }
+                e.preventDefault(); e.stopImmediatePropagation();
+                showDemoModal(); return;
             }
             el = el.parentElement;
         }
+    }, true);
+
+    document.addEventListener('change', function (e) {
+        var el = e.target;
+        if (!el) return;
+        if (el.tagName === 'INPUT' && el.type === 'file' && el.closest('[wire\\:id]')) {
+            e.preventDefault(); e.stopImmediatePropagation();
+            el.value = '';
+            showDemoModal(); return;
+        }
+        var wireChange = el.getAttribute ? el.getAttribute('wire:change') : null;
+        if (wireChange && isMutation(wireChange)) {
+            e.preventDefault(); e.stopImmediatePropagation();
+            showDemoModal();
+        }
+    }, true);
+
+    document.addEventListener('submit', function (e) {
+        var form = e.target;
+        if (!form) return;
+        if (form.method && form.method.toLowerCase() === 'get') return;
+        if (form.action && form.action.indexOf('logout') !== -1) return;
+        if (form.getAttribute && form.getAttribute('wire:submit')) return;
+        e.preventDefault(); e.stopImmediatePropagation();
+        showDemoModal();
     }, true);
 })();
 </script>
