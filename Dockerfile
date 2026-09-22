@@ -32,4 +32,4 @@ EXPOSE 8007
 # The bind mount in docker-compose.yml (.:/var/www/html) shadows this image's
 # baked vendor/, node_modules/, and public/build/ with the host directory, so
 # they're rebuilt here at container start rather than assumed present.
-CMD ["sh", "-c", "composer install --no-interaction --prefer-dist --no-progress && npm run build && php artisan config:clear && php artisan serve --host=0.0.0.0 --port=8007"]
+CMD ["sh", "-c", "composer install --no-interaction --prefer-dist --no-progress && npm install --prefer-offline --no-audit --no-fund && npm run build && php artisan config:clear && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8007"]
