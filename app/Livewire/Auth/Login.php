@@ -30,7 +30,7 @@ class Login extends Component
 
         request()->session()->regenerate();
 
-        $this->redirect(route('dashboard'), navigate: false);
+        $this->redirect('/dashboard', navigate: false);
     }
 
     public function render()
