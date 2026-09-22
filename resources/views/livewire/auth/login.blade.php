@@ -30,7 +30,5 @@
         <p>compliance@tradecustoms.local — Compliance Manager</p>
         <p>finance@tradecustoms.local — Finance</p>
         <p>client@tradecustoms.local — Client</p>
-        <p class="mt-2 pt-2 border-t border-gray-200 font-medium text-gray-600">Admin login</p>
-        <p>superadmin@tradecustoms.local — Super Admin</p>
     </div>
 </div>
