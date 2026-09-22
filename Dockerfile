@@ -32,4 +32,4 @@ EXPOSE 8007
 # The bind mount in docker-compose.yml (.:/var/www/html) shadows this image's
 # baked vendor/, node_modules/, and public/build/ with the host directory, so
 # they're rebuilt here at container start rather than assumed present.
-CMD ["bash", "-c", "mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache && chmod -R 775 storage bootstrap/cache && composer install --no-interaction --prefer-dist --no-progress && npm install --prefer-offline --no-audit --no-fund && npm run build && (grep -qE '^APP_KEY=base64:' .env 2>/dev/null || php artisan key:generate --ansi --force) && php artisan config:clear && php artisan migrate --force && php artisan db:seed --force && php artisan serve --host=0.0.0.0 --port=8007"]
+CMD ["bash", "-c", "mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache && chmod -R 775 storage bootstrap/cache && php artisan storage:link --force || true && (grep -qE '^APP_KEY=base64:' .env 2>/dev/null || php artisan key:generate --ansi --force) && php artisan config:clear && php artisan migrate --force && php artisan db:seed --force && php artisan serve --host=0.0.0.0 --port=8007"]
