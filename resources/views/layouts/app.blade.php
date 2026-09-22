@@ -97,7 +97,8 @@
     </div>
 
     <div class="lg:pl-0 flex flex-1 flex-col min-h-screen">
-        <div class="sticky top-0 z-30 flex h-16 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm lg:hidden">
+        <div class="sticky z-[45] flex h-16 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm lg:hidden"
+             style="{{ $isDemo ? 'top: 40px' : 'top: 0' }}">
             <button @click="sidebarOpen = true" class="text-gray-700">
                 <x-icon name="bars-3" class="h-6 w-6" />
             </button>
@@ -113,76 +114,106 @@
 </div>
 @livewireScripts
 
-@if(auth()->check() && !auth()->user()->hasRole('Super Admin'))
+@if($isDemo)
 <script>
-document.addEventListener('livewire:init', function () {
-    Livewire.hook('request', function ({ fail }) {
-        fail(function ({ status, preventDefault }) {
-            if (status === 403) {
-                preventDefault();
-                Livewire.dispatch('show-demo-modal');
-            }
-        });
-    });
-});
-
 (function () {
-    var MUTATION_KEYWORDS = [
-        'save','create','delete','upload','store','update','submit','add','remove',
-        'edit','import','approve','reject','attach','detach','assign','dispatch',
-        'generate','export','send','confirm','destroy','toggle'
+    /* ================================================================
+     * DEMO MODE GUARD v2 — fetch interception
+     *
+     * Intercepts every Livewire POST before it hits the server:
+     *   - demo-contact-modal requests  → allow (contact form works)
+     *   - poll ($refresh) / model-only → allow (page stays interactive)
+     *   - write method calls            → show modal, return proper no-op
+     *
+     * The no-op echoes each component's snapshot unchanged so loading
+     * indicators clear and the page stays intact.
+     * ================================================================ */
+
+    var WRITE_METHODS = [
+        'create','save','delete','store','update','upload','submit',
+        'add','remove','approve','reject','attach','detach','assign',
+        'confirm','destroy','complete','fail','mark','process','archive',
+        'activate','deactivate','reset','publish','verify','resolve',
+        'retry','toggle','import','send','generate','record','log'
     ];
 
-    function isMutation(str) {
-        if (!str) return false;
-        var lc = str.toLowerCase();
-        return MUTATION_KEYWORDS.some(function (k) { return lc.includes(k); });
+    function isWriteCall(name) {
+        if (!name || name === '$refresh') return false;
+        var lc = name.toLowerCase();
+        return WRITE_METHODS.some(function (k) { return lc.indexOf(k) !== -1; });
     }
 
     function showDemoModal() {
-        if (window.Livewire) { Livewire.dispatch('show-demo-modal'); }
+        if (window.Livewire) { window.Livewire.dispatch('show-demo-modal'); }
     }
 
-    document.addEventListener('click', function (e) {
-        var el = e.target;
-        for (var i = 0; i < 5; i++) {
-            if (!el || el === document.body) break;
-            var wireClick = el.getAttribute ? el.getAttribute('wire:click') : null;
-            if (wireClick && isMutation(wireClick)) {
-                e.preventDefault(); e.stopImmediatePropagation();
-                showDemoModal(); return;
-            }
-            if (el.tagName === 'BUTTON' && (el.type === 'submit' || !el.type) &&
-                el.closest('[wire\\:id]') && !el.closest('form[action*="logout"]')) {
-                e.preventDefault(); e.stopImmediatePropagation();
-                showDemoModal(); return;
-            }
-            el = el.parentElement;
-        }
-    }, true);
+    var _fetch = window.fetch;
+    window.fetch = function (url, opts) {
+        var urlStr = typeof url === 'string' ? url : (url && url.href ? url.href : String(url));
+        var isLwUpdate = opts && opts.method === 'POST' && urlStr.indexOf('livewire/update') !== -1;
+        var isLwUpload = opts && opts.method === 'POST' && urlStr.indexOf('livewire/upload') !== -1;
 
-    document.addEventListener('change', function (e) {
-        var el = e.target;
-        if (!el) return;
-        if (el.tagName === 'INPUT' && el.type === 'file' && el.closest('[wire\\:id]')) {
-            e.preventDefault(); e.stopImmediatePropagation();
-            el.value = '';
-            showDemoModal(); return;
-        }
-        var wireChange = el.getAttribute ? el.getAttribute('wire:change') : null;
-        if (wireChange && isMutation(wireChange)) {
-            e.preventDefault(); e.stopImmediatePropagation();
+        if (!isLwUpdate && !isLwUpload) return _fetch.apply(this, arguments);
+
+        if (isLwUpload) {
             showDemoModal();
+            return Promise.resolve(new Response(
+                JSON.stringify({ message: 'Demo mode' }),
+                { status: 422, headers: { 'Content-Type': 'application/json' } }
+            ));
         }
-    }, true);
 
+        var body = '';
+        try { body = opts.body ? String(opts.body) : ''; } catch (e) {}
+
+        // Always allow the DemoContactModal (contact form + show/close actions)
+        if (body.indexOf('demo-contact-modal') !== -1) return _fetch.apply(this, arguments);
+
+        // Allow poll-only and model-only updates (no explicit write calls)
+        var hasWrite = false;
+        try {
+            var d = JSON.parse(body);
+            if (Array.isArray(d.components)) {
+                hasWrite = d.components.some(function (c) {
+                    return (c.calls || []).some(function (call) { return isWriteCall(call.method); });
+                });
+            }
+        } catch (e) {}
+
+        if (!hasWrite) return _fetch.apply(this, arguments);
+
+        // Write request: show modal and return a proper no-op so loading states clear
+        showDemoModal();
+        try {
+            var req = JSON.parse(body);
+            var noOp = (req.components || []).map(function (c) {
+                try {
+                    var snap = JSON.parse(c.snapshot);
+                    return { id: snap.memo.id, snapshot: c.snapshot,
+                             effects: { html: null, returns: {}, dispatches: [], xjs: [] } };
+                } catch (e2) { return null; }
+            }).filter(Boolean);
+            return Promise.resolve(new Response(
+                JSON.stringify({ components: noOp, assets: [] }),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            ));
+        } catch (e) {}
+
+        return Promise.resolve(new Response(
+            JSON.stringify({ components: [], assets: [] }),
+            { status: 200, headers: { 'Content-Type': 'application/json' } }
+        ));
+    };
+
+    // Regular HTML form submissions (non-Livewire, non-logout, non-GET)
     document.addEventListener('submit', function (e) {
         var form = e.target;
         if (!form) return;
         if (form.method && form.method.toLowerCase() === 'get') return;
         if (form.action && form.action.indexOf('logout') !== -1) return;
         if (form.getAttribute && form.getAttribute('wire:submit')) return;
-        e.preventDefault(); e.stopImmediatePropagation();
+        e.preventDefault();
+        e.stopImmediatePropagation();
         showDemoModal();
     }, true);
 })();
