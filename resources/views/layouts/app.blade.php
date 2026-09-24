@@ -22,11 +22,11 @@
     <div :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
          class="fixed left-0 bottom-0 z-50 w-64 transform bg-gray-900 transition-transform duration-200 ease-in-out lg:static lg:translate-x-0 lg:flex lg:flex-col lg:shrink-0"
          style="{{ $isDemo ? 'top: 40px' : 'top: 0' }}">
-        <div class="flex h-16 items-center gap-2 px-5">
+        <div class="flex h-16 shrink-0 items-center gap-2 px-5">
             <div class="flex h-8 w-8 items-center justify-center rounded-md bg-teal-600 text-white font-bold">TC</div>
             <span class="text-white font-semibold text-sm leading-tight">Trade Customs<br>Intelligence</span>
         </div>
-        <nav class="flex-1 space-y-1 px-3 py-4">
+        <nav class="flex-1 min-h-0 space-y-1 overflow-y-auto px-3 py-4">
             @php
                 $navItems = [
                     ['label' => 'Dashboard', 'route' => 'dashboard', 'icon' => 'home'],
@@ -77,7 +77,7 @@
                 </div>
             @endrole
         </nav>
-        <div class="border-t border-gray-800 p-4">
+        <div class="shrink-0 border-t border-gray-800 p-4">
             <div class="flex items-center gap-3">
                 <div class="flex h-9 w-9 items-center justify-center rounded-full bg-teal-700 text-white text-sm font-semibold">
                     {{ strtoupper(substr(auth()->user()->name ?? '?', 0, 1)) }}
