@@ -27,8 +27,11 @@
                 @error('contact_email') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
             </div>
             <div class="sm:col-span-2 flex justify-end gap-2">
-                <button type="button" wire:click="$set('showForm', false)" class="btn btn-secondary">Cancel</button>
-                <button type="submit" class="btn btn-primary">Save client</button>
+                <button type="button" wire:click="$set('showForm', false)" wire:loading.attr="disabled" wire:target="save" class="btn btn-secondary">Cancel</button>
+                <button type="submit" wire:loading.attr="disabled" wire:target="save" class="btn btn-primary">
+                    <span wire:loading.remove wire:target="save">Save client</span>
+                    <span wire:loading wire:target="save">Saving…</span>
+                </button>
             </div>
         </form>
     @endif

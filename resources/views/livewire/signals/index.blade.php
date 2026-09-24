@@ -14,8 +14,8 @@
 
     <div class="flex gap-2">
         @foreach (['open' => 'Open', 'resolved' => 'Resolved', 'all' => 'All'] as $key => $label)
-            <button wire:click="$set('filter', '{{ $key }}')"
-                class="rounded-full px-3 py-1 text-xs font-medium {{ $filter === $key ? 'bg-teal-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+            <button wire:click="$set('filter', '{{ $key }}')" wire:loading.attr="disabled" wire:target="$set('filter', '{{ $key }}')"
+                class="rounded-full px-3 py-1 text-xs font-medium disabled:opacity-60 {{ $filter === $key ? 'bg-teal-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
                 {{ $label }}
             </button>
         @endforeach
@@ -60,7 +60,10 @@
                         <td class="px-4 py-3 text-right">
                             @unlessrole('Client|Finance')
                                 @if ($event->isOpen())
-                                    <button wire:click="resolve({{ $event->id }})" class="text-teal-600 hover:text-teal-700 text-xs font-medium">Mark resolved</button>
+                                    <button wire:click="resolve({{ $event->id }})" wire:loading.attr="disabled" wire:target="resolve({{ $event->id }})" class="text-teal-600 hover:text-teal-700 text-xs font-medium disabled:opacity-60">
+                                        <span wire:loading.remove wire:target="resolve({{ $event->id }})">Mark resolved</span>
+                                        <span wire:loading wire:target="resolve({{ $event->id }})">Resolving…</span>
+                                    </button>
                                 @endif
                             @endunlessrole
                         </td>

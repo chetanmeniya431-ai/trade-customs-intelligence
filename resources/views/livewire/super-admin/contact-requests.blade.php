@@ -14,8 +14,8 @@
     {{-- Filter tabs --}}
     <div class="mb-4 flex gap-2 border-b border-gray-200">
         @foreach(['new' => 'New', 'responded' => 'Responded', 'all' => 'All'] as $value => $label)
-            <button wire:click="filterBy('{{ $value }}')"
-                    class="pb-3 px-1 text-sm font-medium border-b-2 -mb-px transition-colors
+            <button wire:click="filterBy('{{ $value }}')" wire:loading.attr="disabled" wire:target="filterBy('{{ $value }}')"
+                    class="pb-3 px-1 text-sm font-medium border-b-2 -mb-px transition-colors disabled:opacity-60
                            {{ $filter === $value ? 'border-teal-600 text-teal-600' : 'border-transparent text-gray-500 hover:text-gray-700' }}">
                 {{ $label }}
             </button>
@@ -72,14 +72,22 @@
                                 @if($markingId === $req->id)
                                     <div class="flex items-center gap-2">
                                         <input wire:model="notes" type="text" placeholder="Add a note..."
+                                               wire:loading.attr="disabled" wire:target="saveResponse"
                                                class="rounded-md border border-gray-300 px-2 py-1 text-xs focus:border-teal-500 focus:ring-1 focus:ring-teal-500">
-                                        <button wire:click="saveResponse" class="rounded-md bg-teal-600 px-2 py-1 text-xs font-medium text-white hover:bg-teal-700">Save</button>
-                                        <button wire:click="cancelRespond" class="rounded-md border border-gray-300 px-2 py-1 text-xs text-gray-600 hover:bg-gray-50">Cancel</button>
+                                        <button wire:click="saveResponse" wire:loading.attr="disabled" wire:target="saveResponse"
+                                                class="rounded-md bg-teal-600 px-2 py-1 text-xs font-medium text-white hover:bg-teal-700 disabled:opacity-60">
+                                            <span wire:loading.remove wire:target="saveResponse">Save</span>
+                                            <span wire:loading wire:target="saveResponse">Saving…</span>
+                                        </button>
+                                        <button wire:click="cancelRespond" wire:loading.attr="disabled" wire:target="saveResponse"
+                                                class="rounded-md border border-gray-300 px-2 py-1 text-xs text-gray-600 hover:bg-gray-50 disabled:opacity-60">Cancel</button>
                                     </div>
                                 @else
                                     <button wire:click="startRespond({{ $req->id }})"
-                                            class="rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50">
-                                        Mark responded
+                                            wire:loading.attr="disabled" wire:target="startRespond({{ $req->id }})"
+                                            class="rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60">
+                                        <span wire:loading.remove wire:target="startRespond({{ $req->id }})">Mark responded</span>
+                                        <span wire:loading wire:target="startRespond({{ $req->id }})">Loading…</span>
                                     </button>
                                 @endif
                             </td>

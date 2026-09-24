@@ -100,7 +100,7 @@
                                 </a>
                                 @unlessrole('Client')
                                     @if (!$doc->verified)
-                                        <button wire:click="verifyDocument({{ $doc->id }})" class="btn btn-secondary !py-1.5 !px-2.5 text-xs">
+                                        <button wire:click="verifyDocument({{ $doc->id }})" wire:loading.attr="disabled" wire:target="verifyDocument({{ $doc->id }})" class="btn btn-secondary !py-1.5 !px-2.5 text-xs">
                                             <x-icon name="check" class="h-4 w-4" /> Verify
                                         </button>
                                     @endif
@@ -110,6 +110,7 @@
                             @unlessrole('Client|Finance')
                                 @if ($activeUploadDocId === $doc->id)
                                     <input type="file" wire:model="uploadFile" accept="application/pdf" class="text-xs">
+                                    <span wire:loading wire:target="uploadFile" class="text-xs text-gray-500">Uploading…</span>
                                 @else
                                     <button wire:click="selectUploadTarget({{ $doc->id }})" class="btn btn-secondary !py-1.5 !px-2.5 text-xs">
                                         <x-icon name="arrow-up-tray" class="h-4 w-4" /> {{ $doc->isUploaded() ? 'Replace' : 'Upload' }}
@@ -135,8 +136,8 @@
                                         @unlessrole('Client')
                                         @if ($finding->status === 'open')
                                             <div class="flex gap-1 shrink-0">
-                                                <button wire:click="confirmFinding({{ $finding->id }})" class="btn btn-secondary !py-1 !px-2 text-xs">Confirm</button>
-                                                <button wire:click="resolveFinding({{ $finding->id }})" class="btn btn-secondary !py-1 !px-2 text-xs">Resolve</button>
+                                                <button wire:click="confirmFinding({{ $finding->id }})" wire:loading.attr="disabled" wire:target="confirmFinding({{ $finding->id }})" class="btn btn-secondary !py-1 !px-2 text-xs">Confirm</button>
+                                                <button wire:click="resolveFinding({{ $finding->id }})" wire:loading.attr="disabled" wire:target="resolveFinding({{ $finding->id }})" class="btn btn-secondary !py-1 !px-2 text-xs">Resolve</button>
                                             </div>
                                         @endif
                                         @endunlessrole

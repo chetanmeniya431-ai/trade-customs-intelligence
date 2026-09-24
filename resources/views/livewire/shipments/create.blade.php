@@ -44,7 +44,7 @@
                         {{ $similarMatch['declared_currency'] }} {{ number_format($similarMatch['declared_value'], 0) }},
                         {{ round($similarMatch['similarity'] * 100) }}% similar).
                     </p>
-                    <button type="button" wire:click="copyFromSimilar({{ $similarMatch['id'] }})" class="mt-2 text-teal-700 font-medium hover:underline">
+                    <button type="button" wire:click="copyFromSimilar({{ $similarMatch['id'] }})" wire:loading.attr="disabled" wire:target="copyFromSimilar({{ $similarMatch['id'] }})" class="mt-2 text-teal-700 font-medium hover:underline">
                         Use its HS code &amp; route as a starting point →
                     </button>
                 </div>

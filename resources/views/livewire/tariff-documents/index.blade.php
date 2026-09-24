@@ -77,7 +77,7 @@
                         <td class="px-4 py-3 text-right space-x-2 whitespace-nowrap">
                             <a href="{{ route('tariff-documents.download', $doc) }}" class="text-teal-600 hover:text-teal-700 text-xs font-medium">Download</a>
                             <button wire:click="reprocess({{ $doc->id }})" wire:loading.attr="disabled" class="text-gray-500 hover:text-gray-700 text-xs font-medium">Re-process</button>
-                            <button wire:click="delete({{ $doc->id }})" wire:confirm="Delete this document and its embedded chunks?" class="text-red-500 hover:text-red-700 text-xs font-medium">Delete</button>
+                            <button wire:click="delete({{ $doc->id }})" wire:loading.attr="disabled" wire:target="delete({{ $doc->id }})" wire:confirm="Delete this document and its embedded chunks?" class="text-red-500 hover:text-red-700 text-xs font-medium">Delete</button>
                         </td>
                     </tr>
                 @empty
