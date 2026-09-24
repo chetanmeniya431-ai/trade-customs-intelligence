@@ -115,7 +115,7 @@
 @livewireScripts
 
 @if($isDemo)
-<script>
+<script nonce="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}">
 (function () {
     /* ================================================================
      * DEMO MODE GUARD v2 — fetch interception
@@ -151,17 +151,15 @@
     window.fetch = function (url, opts) {
         var urlStr = typeof url === 'string' ? url : (url && url.href ? url.href : String(url));
         var isLwUpdate = opts && opts.method === 'POST' && urlStr.indexOf('livewire/update') !== -1;
-        var isLwUpload = opts && opts.method === 'POST' && urlStr.indexOf('livewire/upload') !== -1;
 
-        if (!isLwUpdate && !isLwUpload) return _fetch.apply(this, arguments);
-
-        if (isLwUpload) {
-            showDemoModal();
-            return Promise.resolve(new Response(
-                JSON.stringify({ message: 'Demo mode' }),
-                { status: 422, headers: { 'Content-Type': 'application/json' } }
-            ));
-        }
+        // Let the temp file upload through untouched — it only stores a
+        // temporary file server-side (no domain write), and blocking it here
+        // corrupts Livewire's own upload state so the *next* request (the
+        // real save/store call) reaches the server for real instead of being
+        // caught below. The actual write is always a wire:model.update call,
+        // which IS caught by the isLwUpdate branch regardless of whether a
+        // file was involved.
+        if (!isLwUpdate) return _fetch.apply(this, arguments);
 
         var body = '';
         try { body = opts.body ? String(opts.body) : ''; } catch (e) {}
