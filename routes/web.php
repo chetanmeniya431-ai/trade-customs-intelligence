@@ -38,10 +38,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/shipments', ShipmentsIndex::class)->name('shipments.index');
     Route::get('/shipments/import', ShipmentsImportPage::class)
         ->name('shipments.import')
-        ->middleware('role:Customs Broker,Import/Export Coordinator');
+        ->middleware('role:Super Admin,Customs Broker,Import/Export Coordinator');
     Route::get('/shipments/create', ShipmentsCreate::class)
         ->name('shipments.create')
-        ->middleware('role:Customs Broker,Import/Export Coordinator');
+        ->middleware('role:Super Admin,Customs Broker,Import/Export Coordinator');
     Route::get('/shipments/{shipment}', ShipmentsShow::class)->name('shipments.show');
     Route::get('/shipment-documents/{document}/download', ShipmentDocumentDownloadController::class)
         ->name('shipments.documents.download');
@@ -50,7 +50,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/tariff-documents', TariffDocumentsIndex::class)
         ->name('tariff-documents.index')
-        ->middleware('role:Customs Broker,Import/Export Coordinator');
+        ->middleware('role:Super Admin,Customs Broker,Import/Export Coordinator');
     Route::get('/tariff-documents/{tariffDocument}/download', TariffDocumentDownloadController::class)
         ->name('tariff-documents.download');
 
@@ -61,11 +61,11 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/clients', ClientsIndex::class)
         ->name('clients.index')
-        ->middleware('role:Customs Broker,Import/Export Coordinator');
+        ->middleware('role:Super Admin,Customs Broker,Import/Export Coordinator');
 
     Route::get('/settings/users', SettingsUsers::class)
         ->name('settings.users')
-        ->middleware('role:Customs Broker');
+        ->middleware('role:Super Admin,Customs Broker');
 
     Route::get('/super-admin/contacts', SuperAdminContacts::class)
         ->name('super-admin.contacts')
