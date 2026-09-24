@@ -14,10 +14,9 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     networks:
       - trade-customs
+      - nirmantra_shared
 
   queue:
     build:
@@ -31,10 +30,9 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     networks:
       - trade-customs
+      - nirmantra_shared
 
   scheduler:
     build:
@@ -75,6 +73,8 @@ services:
 networks:
   trade-customs:
     driver: bridge
+  nirmantra_shared:
+    external: true
 
 volumes:
   db_data:
