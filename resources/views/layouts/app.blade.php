@@ -20,7 +20,7 @@
     <div x-show="sidebarOpen" x-cloak class="fixed inset-0 z-40 bg-gray-900/60 lg:hidden" @click="sidebarOpen = false"></div>
 
     <div :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
-         class="fixed left-0 bottom-0 z-50 w-64 transform bg-gray-900 transition-transform duration-200 ease-in-out lg:static lg:translate-x-0 lg:flex lg:flex-col lg:shrink-0"
+         class="fixed left-0 bottom-0 z-50 w-64 max-h-screen transform bg-gray-900 transition-transform duration-200 ease-in-out lg:sticky lg:bottom-auto lg:translate-x-0 lg:flex lg:flex-col lg:shrink-0"
          style="{{ $isDemo ? 'top: 40px' : 'top: 0' }}">
         <div class="flex h-16 shrink-0 items-center gap-2 px-5">
             <div class="flex h-8 w-8 items-center justify-center rounded-md bg-teal-600 text-white font-bold">TC</div>
